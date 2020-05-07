@@ -23,6 +23,26 @@
 #include "conversions.h"
 #include "powerline.h"
 
+std::string mem_custom_string( const MemoryStatus & mem_status )
+{
+  std::ostringstream oss;
+  // Change the percision for floats, for a pretty output
+  oss.precision( 2 );
+  oss.setf( std::ios::fixed | std::ios::right );
+
+  const float percentage_mem = mem_status.used_mem /
+    static_cast<float>( mem_status.total_mem ) * 100.0;
+
+  oss << " - MEM:";
+  if( mem_status.used_mem>1024 )
+    oss << mem_status.used_mem/1024 << "GB";
+  else
+    oss << mem_status.used_mem << "MB";
+  oss << " " << percentage_mem << '%';
+
+  return oss.str();
+}
+
 std::string mem_string( const MemoryStatus & mem_status,
   MEMORY_MODE mode,
   bool use_colors,

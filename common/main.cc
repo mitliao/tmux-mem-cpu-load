@@ -17,6 +17,7 @@
 
 #include <cstring>
 #include <iostream>
+#include <iomanip>
 #include <fstream>
 #include <sstream>
 #include <string>
@@ -34,6 +35,30 @@
 #include "load.h"
 
 #include "powerline.h"
+
+std::string cpu_custom_string( unsigned int cpu_usage_delay, unsigned int graph_lines )
+{
+
+  float percentage;
+
+  //output stuff
+  std::ostringstream oss;
+  oss.precision( 2 );
+  oss.setf( std::ios::fixed | std::ios::right );
+
+  // get %
+  percentage = cpu_percentage( cpu_usage_delay );
+  oss << " - CPU:";
+  if( graph_lines > 0 )
+  {
+    oss << "[";
+    oss << get_graph_by_percentage( unsigned( percentage ), graph_lines );
+    oss << "]";
+  }
+  oss << " " << percentage;
+  oss << "%";
+  return oss.str();
+}
 
 std::string cpu_string( CPU_MODE cpu_mode, unsigned int cpu_usage_delay, unsigned int graph_lines,
     bool use_colors = false,
@@ -141,6 +166,7 @@ int main( int argc, char** argv )
   bool use_colors = false;
   bool use_powerline_left = false;
   bool use_powerline_right = false;
+  bool use_custom_mode = true;
   MEMORY_MODE mem_mode = MEMORY_MODE_DEFAULT;
   CPU_MODE cpu_mode = CPU_MODE_DEFAULT;
 
@@ -166,6 +192,8 @@ int main( int argc, char** argv )
   // while c != -1
   while( (c = getopt_long( argc, argv, "hi:cpqg:m:a:t:", long_options, NULL) ) != -1 )
   {
+    if( c != 'i' && c != 'h' && c != 'g' )
+      use_custom_mode = false;
     switch( c )
     {
       case 'h': // --help, -h
@@ -242,6 +270,32 @@ int main( int argc, char** argv )
   }
 
   MemoryStatus memory_status;
+
+  if( use_custom_mode )
+  {
+    bool first = true;
+    while( 1 )
+    {
+      mem_status( memory_status );
+      if( first )
+      {
+        std::cout << " - CPU:[";
+        for( int i = 0; i < graph_lines; i++ )
+          std::cout << "|";
+        std::cout << "] 100.00%";
+        std::cout << " - MEM:";
+        std::cout << std::setprecision( 2 ) << std::fixed << memory_status.total_mem/1024 << "GB 100.00%";
+        first = false;
+      }
+      else
+      {
+        std::cout << cpu_custom_string( cpu_usage_delay, graph_lines )
+          << mem_custom_string( memory_status );
+      }
+      std::cout << std::endl;
+    }
+  }
+
   mem_status( memory_status );
   std::cout << mem_string( memory_status, mem_mode, use_colors, use_powerline_left, use_powerline_right )
     << cpu_string( cpu_mode, cpu_usage_delay, graph_lines, use_colors, use_powerline_left, use_powerline_right )

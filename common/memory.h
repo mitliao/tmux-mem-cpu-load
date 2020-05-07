@@ -47,6 +47,7 @@ enum MEMORY_MODE
   MEMORY_MODE_USAGE_PERCENTAGE
 };
 
+std::string mem_custom_string( const MemoryStatus & mem_status );
 std::string mem_string( const MemoryStatus & mem_status,
   MEMORY_MODE mode = MEMORY_MODE_DEFAULT,
   bool use_colors = false,
