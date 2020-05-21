@@ -33,12 +33,14 @@ std::string mem_custom_string( const MemoryStatus & mem_status )
   const float percentage_mem = mem_status.used_mem /
     static_cast<float>( mem_status.total_mem ) * 100.0;
 
-  oss << " - MEM:";
-  if( mem_status.used_mem>1024 )
+  oss << "[";
+  if( mem_status.used_mem>=1024 )
     oss << mem_status.used_mem/1024 << "GB";
   else
     oss << mem_status.used_mem << "MB";
-  oss << " " << percentage_mem << '%';
+  oss << " ";
+  oss << percentage_mem;
+  oss << "%]";
 
   return oss.str();
 }

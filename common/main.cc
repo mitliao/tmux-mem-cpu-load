@@ -48,15 +48,14 @@ std::string cpu_custom_string( unsigned int cpu_usage_delay, unsigned int graph_
 
   // get %
   percentage = cpu_percentage( cpu_usage_delay );
-  oss << " - CPU:";
+  oss << "[";
   if( graph_lines > 0 )
   {
-    oss << "[";
     oss << get_graph_by_percentage( unsigned( percentage ), graph_lines );
-    oss << "]";
   }
-  oss << " " << percentage;
-  oss << "%";
+  oss << " ";
+  oss << percentage;
+  oss << "%]";
   return oss.str();
 }
 
@@ -279,17 +278,18 @@ int main( int argc, char** argv )
       mem_status( memory_status );
       if( first )
       {
-        std::cout << " - CPU:[";
+        std::cout << "[";
         for( int i = 0; i < graph_lines; i++ )
           std::cout << "|";
-        std::cout << "] 100.00%";
-        std::cout << " - MEM:";
-        std::cout << std::setprecision( 2 ) << std::fixed << memory_status.total_mem/1024 << "GB 100.00%";
+        std::cout << " 100.00%] ";
+        std::cout << "[";
+        std::cout << std::setprecision( 2 ) << std::fixed << memory_status.total_mem/1024 << "GB 100.00%]";
         first = false;
       }
       else
       {
         std::cout << cpu_custom_string( cpu_usage_delay, graph_lines )
+          << " "
           << mem_custom_string( memory_status );
       }
       std::cout << std::endl;

@@ -34,7 +34,7 @@ std::string get_graph_by_percentage( unsigned value, unsigned len )
   }
   for( ; step < len; step++ )
   {
-    bars.append( " " );
+    bars.append( "-" );
   }
 
   return bars;
