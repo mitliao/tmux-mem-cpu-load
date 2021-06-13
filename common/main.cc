@@ -48,14 +48,13 @@ std::string cpu_custom_string( unsigned int cpu_usage_delay, unsigned int graph_
 
   // get %
   percentage = cpu_percentage( cpu_usage_delay );
-  oss << "[";
   if( graph_lines > 0 )
   {
     oss << get_graph_by_percentage( unsigned( percentage ), graph_lines );
   }
   oss << " ";
   oss << percentage;
-  oss << "%]";
+  oss << "%";
   return oss.str();
 }
 
@@ -154,6 +153,8 @@ void print_help()
     << "\tSet cpu % display mode. 0: Default max 100%, 1: Max 100% * number of threads. \n"
     << "-a <value>, --averages-count <value>\n"
     << "\tSet how many load-averages should be drawn. Default: 3\n"
+    << "-s <string>, --averages-count <string>\n"
+    << "\tSeparator for cpu and memory stat. Default: \" \"\n"
     << endl;
 }
 
@@ -168,6 +169,7 @@ int main( int argc, char** argv )
   bool use_custom_mode = true;
   MEMORY_MODE mem_mode = MEMORY_MODE_DEFAULT;
   CPU_MODE cpu_mode = CPU_MODE_DEFAULT;
+  char sep[4] = {0};
 
   static struct option long_options[] =
   {
@@ -184,14 +186,15 @@ int main( int argc, char** argv )
     { "mem-mode", required_argument, NULL, 'm' },
     { "cpu-mode", required_argument, NULL, 't' },
     { "averages-count", required_argument, NULL, 'a' },
+    { "separator", required_argument, NULL, 's' },
     { 0, 0, 0, 0 } // used to handle unknown long options
   };
 
   int c;
   // while c != -1
-  while( (c = getopt_long( argc, argv, "hi:cpqg:m:a:t:", long_options, NULL) ) != -1 )
+  while( (c = getopt_long( argc, argv, "hi:cpqg:m:a:s:t:", long_options, NULL) ) != -1 )
   {
-    if( c != 'i' && c != 'h' && c != 'g' )
+    if( c != 'i' && c != 'h' && c != 'g' && c != 's' )
       use_custom_mode = false;
     switch( c )
     {
@@ -250,6 +253,14 @@ int main( int argc, char** argv )
           }
         averages_count = atoi( optarg );
         break;
+      case 's':
+        if (strlen(optarg) >= sizeof(sep))
+          {
+            std::cerr << "Max length of separator is " << sizeof(sep)-1 << std::endl;
+            return EXIT_FAILURE;
+          }
+        snprintf(sep, sizeof(sep), "%s", optarg);
+        break;
       case '?':
         // getopt_long prints error message automatically
         return EXIT_FAILURE;
@@ -278,18 +289,24 @@ int main( int argc, char** argv )
       mem_status( memory_status );
       if( first )
       {
-        std::cout << "[";
         for( int i = 0; i < graph_lines; i++ )
           std::cout << "|";
-        std::cout << " 100.00%]";
-        std::cout << "[";
-        std::cout << std::setprecision( 2 ) << std::fixed << memory_status.total_mem/1024 << "GB 100.00%]";
+        std::cout << " 100.00%";
+        if (sep[0])
+          std::cout << sep;
+        else
+          std::cout << " ";
+        std::cout << std::setprecision( 2 ) << std::fixed << memory_status.total_mem/1024 << "GB 100.00%";
         first = false;
       }
       else
       {
-        std::cout << cpu_custom_string( cpu_usage_delay, graph_lines )
-          << mem_custom_string( memory_status );
+        std::cout << cpu_custom_string( cpu_usage_delay, graph_lines );
+        if (sep[0])
+          std::cout << sep;
+        else
+          std::cout << " ";
+        std::cout << mem_custom_string( memory_status );
       }
       std::cout << std::endl;
     }
