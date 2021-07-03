@@ -291,12 +291,12 @@ int main( int argc, char** argv )
       {
         for( int i = 0; i < graph_lines; i++ )
           std::cout << "|";
-        std::cout << " 100.00%";
+        std::cout << " 100%";
         if (sep[0])
           std::cout << sep;
         else
           std::cout << " ";
-        std::cout << std::setprecision( 2 ) << std::fixed << memory_status.total_mem/1024 << "GB 100.00%";
+        std::cout << std::setprecision( 2 ) << std::fixed << memory_status.total_mem/1024 << "GB 100%";
         first = false;
       }
       else
