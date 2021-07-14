@@ -50,7 +50,7 @@ std::string cpu_custom_string( unsigned int cpu_usage_delay, unsigned int graph_
   percentage = cpu_percentage( cpu_usage_delay );
   if( graph_lines > 0 )
   {
-    oss << get_graph_by_percentage( unsigned( percentage ), graph_lines );
+    oss << get_graph_by_percentage( unsigned( percentage + 5 ), graph_lines );
   }
   oss << " ";
   oss << percentage;
